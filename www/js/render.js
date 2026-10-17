@@ -4,14 +4,23 @@
 G.render = (() => {
   const D = G.data, U = G.util, SP = G.sprites;
   let canvas, ctx, zoom = 1, VW = 400, VH = 230, dpr = 1;
-  let night, nctx;
   const cam = { x: 0, y: 0 };
+  const flashCache = new WeakMap();
+  function flashed(e, k) {
+    let m = flashCache.get(e.pal);
+    if (!m) { m = {}; flashCache.set(e.pal, m); }
+    if (!m[k]) {
+      const pal = {};
+      for (const c in e.pal) pal[c] = SP.shade(e.pal[c], k);
+      pal.s = SP.shade(e.pal.s || '#f0c8a0', k);
+      m[k] = pal;
+    }
+    return Object.assign({}, e, { pal: m[k] });
+  }
 
   function init(c) {
     canvas = c;
     ctx = canvas.getContext('2d');
-    night = document.createElement('canvas');
-    nctx = night.getContext('2d');
     resize();
     window.addEventListener('resize', resize);
   }
@@ -25,80 +34,70 @@ G.render = (() => {
     VH = h > w ? 260 : 200;
     zoom = canvas.height / VH;
     VW = canvas.width / zoom;
-    night.width = Math.ceil(VW); night.height = Math.ceil(VH);
-  }
-
-  function frameOf(e) {
-    const anim = ['bat', 'slime', 'ghost'].includes(e.tpl);
-    if (e.moving || anim) return Math.floor(e.anim * (anim ? 5 : 8)) % 2;
-    return 0;
   }
 
   function drawEntity(e, isHero) {
     const scale = e.scale || 1;
-    const spr = SP.get(e.tpl, e.pal, frameOf(e), e.short);
-    const w = spr.width * scale, h = spr.height * scale;
-    const float = e.def && e.def.fly ? -4 + Math.sin(e.anim * 4) * 1.5 : 0;
+    const t = e.anim || 0;
+    const float = e.def && e.def.fly ? -4 + Math.sin(t * 4) * 1.5 : 0;
+    const w = (e.tpl === 'humanoid' ? 12 : 16) * scale;
     // Ombre
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath(); ctx.ellipse(e.x, e.y + 1, w * 0.35, 2.5 * scale, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.28)';
+    ctx.beginPath(); ctx.ellipse(e.x, e.y + 0.5, w * 0.45, 2.6 * scale, 0, 0, Math.PI * 2); ctx.fill();
     if (isHero) {
-      ctx.strokeStyle = 'rgba(255,216,74,0.7)'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.ellipse(e.x, e.y + 1, 8, 3.5, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,216,74,0.75)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.ellipse(e.x, e.y + 0.5, 8.5, 3.6, 0, 0, Math.PI * 2); ctx.stroke();
     }
     if (e.rank === 'elite' || e.boss) {
-      ctx.fillStyle = e.boss ? 'rgba(255,40,80,0.18)' : 'rgba(255,200,60,0.15)';
-      ctx.beginPath(); ctx.ellipse(e.x, e.y, w * 0.5, 5 * scale, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = e.boss ? 'rgba(255,40,80,0.2)' : 'rgba(255,200,60,0.18)';
+      ctx.beginPath(); ctx.ellipse(e.x, e.y, w * 0.6, 5 * scale, 0, 0, Math.PI * 2); ctx.fill();
     }
     if (e.boss && e.boss.phase === 2) {
-      ctx.fillStyle = 'rgba(160,40,255,0.25)';
-      ctx.beginPath(); ctx.arc(e.x, e.y - h / 2, w * 0.6 + Math.sin(e.anim * 6) * 2, 0, Math.PI * 2); ctx.fill();
+      const g = ctx.createRadialGradient(e.x, e.y - 12 * scale, 2, e.x, e.y - 12 * scale, 20 * scale);
+      g.addColorStop(0, 'rgba(160,40,255,0.35)'); g.addColorStop(1, 'rgba(160,40,255,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(e.x, e.y - 12 * scale, 20 * scale + Math.sin(t * 6) * 2, 0, Math.PI * 2); ctx.fill();
     }
-    const flip = e.tpl === 'scorpion' ? e.faceX > 0 : e.faceX < 0;
-    ctx.save();
-    ctx.translate(Math.round(e.x), 0);
-    if (flip) ctx.scale(-1, 1);
-    const bob = e.moving && e.tpl === 'humanoid' ? (Math.floor(e.anim * 8) % 2) * -0.5 : 0;
-    const y0 = Math.round(e.y - h + 2 + float + bob);
-    if (e.iframes > 0 && e.kind === 'hero') ctx.globalAlpha = 0.55;
-    ctx.drawImage(spr, -w / 2, y0, w, h);
-    if (e.hurtT > 0 || (e.windup > 0 && Math.floor(e.windup * 20) % 2 === 0)) {
-      ctx.globalAlpha = e.hurtT > 0 ? 0.8 : 0.45;
-      ctx.drawImage(SP.flash(spr), -w / 2, y0, w, h);
-    }
-    ctx.restore();
-    if (e.st.slow > 0 || e.st.poison > 0 || e.st.burn > 0) {
-      ctx.globalAlpha = 0.28;
-      ctx.fillStyle = e.st.slow > 0 ? '#7fd8ff' : e.st.poison > 0 ? '#7ddc52' : '#ff7a2f';
-      ctx.beginPath(); ctx.ellipse(e.x, y0 + h / 2, w * 0.45, h * 0.5, 0, 0, Math.PI * 2); ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-    // Couronne de Morvane
-    if (e.def && e.def.crown) {
-      ctx.fillStyle = '#ffd84a';
-      const cx = e.x, cy = y0 - 2;
-      ctx.beginPath(); ctx.moveTo(cx - 8, cy + 4); ctx.lineTo(cx - 8, cy - 3); ctx.lineTo(cx - 4, cy + 1); ctx.lineTo(cx, cy - 5); ctx.lineTo(cx + 4, cy + 1); ctx.lineTo(cx + 8, cy - 3); ctx.lineTo(cx + 8, cy + 4); ctx.fill();
-    }
-    // Arme
+    const flip = e.faceX < 0;
+    // Angle de l'arme dans le repère du personnage
+    let armAngle = null, wAng = null;
     if (e.weapon && e.tpl === 'humanoid') {
-      const hx = e.x + e.faceX * 3 * scale, hy = y0 + h * 0.55;
-      let ang;
       if (e.swing) {
         const k = e.swing.t / e.swing.max;
-        ang = e.swing.arc ? e.swing.dir - e.swing.arc / 2 + e.swing.arc * k : e.swing.dir;
-      } else if (e.weapon === 'arc') ang = e.faceX > 0 ? 0 : Math.PI;
-      else ang = e.faceX > 0 ? -0.9 : Math.PI + 0.9;
-      ctx.save(); ctx.translate(hx, hy);
+        wAng = e.swing.arc ? e.swing.dir - e.swing.arc / 2 + e.swing.arc * k : e.swing.dir;
+      } else if (e.weapon === 'arc') wAng = e.faceX > 0 ? 0 : Math.PI;
+      else wAng = e.faceX > 0 ? -0.9 : Math.PI + 0.9;
+      const local = flip ? Math.PI - wAng : wAng;
+      armAngle = e.swing ? local : (e.weapon === 'arc' ? 0.2 : 1.0);
+    }
+    ctx.save();
+    ctx.translate(e.x, e.y + float);
+    ctx.scale(flip ? -scale : scale, scale);
+    if (e.iframes > 0 && e.kind === 'hero') ctx.globalAlpha = 0.55;
+    // Flash quand le personnage est touché ou prépare une attaque : palette éclaircie (pas de ctx.filter, trop lent)
+    const hurt = e.hurtT > 0 ? 0.65 : (e.windup > 0 && Math.floor(e.windup * 20) % 2 === 0) ? 0.35 : 0;
+    ctx.lineJoin = 'round';
+    const res = G.sprites.drawEntity(ctx, hurt ? flashed(e, hurt) : e, t, armAngle);
+    if (res.hx != null && wAng != null) {
+      ctx.save(); ctx.translate(res.hx, res.hy);
       const glow = e.kind === 'hero' && G.state.save.equip.weapon && G.state.save.equip.weapon.el ? D.ELEMENTS[G.state.save.equip.weapon.el].color : null;
-      SP.drawWeapon(ctx, e.weapon, ang, scale * (e.short ? 0.85 : 1), glow);
+      SP.drawWeapon(ctx, e.weapon, flip ? Math.PI - wAng : wAng, e.short ? 0.85 : 1, glow);
       ctx.restore();
+    }
+    ctx.restore();
+    ctx.globalAlpha = 1;
+    const y0 = e.y + float + res.top * scale;
+    if (e.st.slow > 0 || e.st.poison > 0 || e.st.burn > 0) {
+      ctx.globalAlpha = 0.25;
+      ctx.fillStyle = e.st.slow > 0 ? '#7fd8ff' : e.st.poison > 0 ? '#7ddc52' : '#ff7a2f';
+      ctx.beginPath(); ctx.ellipse(e.x, (y0 + e.y) / 2, w * 0.55, (e.y - y0) * 0.55, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1;
     }
     // Étourdissement
     if (e.st.stun > 0) {
       ctx.fillStyle = '#ffe04a';
       for (let i = 0; i < 3; i++) {
-        const a = e.anim * 5 + i * 2.1;
-        ctx.fillRect(e.x + Math.cos(a) * 6 - 1, y0 - 3 + Math.sin(a) * 2, 2, 2);
+        const a = t * 5 + i * 2.1;
+        ctx.beginPath(); ctx.arc(e.x + Math.cos(a) * 6, y0 - 2 + Math.sin(a) * 2, 1.2, 0, Math.PI * 2); ctx.fill();
       }
     }
     // Barres de vie
@@ -193,7 +192,7 @@ G.render = (() => {
     const S = G.state;
     const h = S.hero;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.imageSmoothingEnabled = false;
+    ctx.imageSmoothingEnabled = true;
     const th = SP.THEMES[S.map.theme];
     ctx.fillStyle = th.bg; ctx.fillRect(0, 0, canvas.width, canvas.height);
     const mw = S.map.w * 16, mh = S.map.h * 16;
@@ -204,12 +203,14 @@ G.render = (() => {
     const sh = S.shakeT > 0 ? S.shakeAmp : 0;
     const ox = Math.round((cam.x + U.rand(-sh, sh)) * zoom) / zoom, oy = Math.round((cam.y + U.rand(-sh, sh)) * zoom) / zoom;
     ctx.setTransform(zoom, 0, 0, zoom, -ox * zoom, -oy * zoom);
-    ctx.imageSmoothingEnabled = false;
+    ctx.imageSmoothingEnabled = true;
 
     // Carte (uniquement la portion visible)
+    const RS = SP.RES;
     const sx = Math.max(0, Math.floor(ox)), sy = Math.max(0, Math.floor(oy));
-    const sw = Math.min(S.mapCanvas.width - sx, Math.ceil(VW) + 2), shh = Math.min(S.mapCanvas.height - sy, Math.ceil(VH) + 2);
-    if (sw > 0 && shh > 0) ctx.drawImage(S.mapCanvas, sx, sy, sw, shh, sx, sy, sw, shh);
+    const sw = Math.min(S.mapCanvas.width / RS - sx, Math.ceil(VW) + 2), shh = Math.min(S.mapCanvas.height / RS - sy, Math.ceil(VH) + 2);
+    ctx.imageSmoothingEnabled = true;
+    if (sw > 0 && shh > 0) ctx.drawImage(S.mapCanvas, sx * RS, sy * RS, sw * RS, shh * RS, sx, sy, sw, shh);
 
     const t = S.time;
     // Zones au sol
@@ -242,13 +243,15 @@ G.render = (() => {
     // Portails
     if (S.map.portal) drawPortal(S.map.portal, t, S.zone.town ? 'Portail des Vents' : 'Retour au village');
     if (S.bossPortal) drawPortal(S.bossPortal, t, 'Retour au village');
-    for (const d of S.drops) drawDrop(d, t);
+    for (const d of S.drops) if (d.x > ox - 20 && d.x < ox + VW + 20 && d.y > oy - 30 && d.y < oy + VH + 20) drawDrop(d, t);
 
     // Entités triées par profondeur
+    // On ne dessine que ce qui est visible à l'écran
+    const vis = (e, m = 40) => e.x > ox - m && e.x < ox + VW + m && e.y > oy - m && e.y < oy + VH + m * 1.5;
     const list = [];
-    for (const n of S.npcs) list.push(n);
-    for (const p of S.party) if (!p.dead) list.push(p);
-    for (const m of S.mobs) if (!m.dead) list.push(m);
+    for (const n of S.npcs) if (vis(n)) list.push(n);
+    for (const p of S.party) if (!p.dead && vis(p)) list.push(p);
+    for (const m of S.mobs) if (!m.dead && vis(m, 40 * (m.scale || 1))) list.push(m);
     list.sort((a, b) => a.y - b.y);
     for (const e of list) {
       if (e.isNpc) {
@@ -263,34 +266,20 @@ G.render = (() => {
         }
       } else drawEntity(e, e === h);
     }
-    for (const p of S.projs) drawProj(p);
+    for (const p of S.projs) if (vis(p)) drawProj(p);
     G.fx.draw(ctx);
 
     // Éclairage jour / nuit
     const dark = G.game.darkness();
     if (dark > 0.02) {
-      nctx.setTransform(1, 0, 0, 1, 0, 0);
-      nctx.globalCompositeOperation = 'source-over';
-      nctx.clearRect(0, 0, night.width, night.height);
-      nctx.fillStyle = `rgba(8,10,40,${dark})`;
-      nctx.fillRect(0, 0, night.width, night.height);
-      nctx.globalCompositeOperation = 'destination-out';
-      const lights = [];
-      if (h) lights.push([h.x, h.y - 6, 85]);
-      for (const p of S.party) if (p !== h && !p.dead) lights.push([p.x, p.y - 6, 35]);
-      for (const p of S.projs) if (p.team === 'ally') lights.push([p.x, p.y, 18]);
-      if (S.map.portal) lights.push([S.map.portal.x, S.map.portal.y - 6, 40]);
-      for (const n of S.npcs) lights.push([n.x, n.y - 6, 30]);
-      for (const [lx, ly, lr] of lights) {
-        const x = lx - ox, y = ly - oy;
-        const g = nctx.createRadialGradient(x, y, 0, x, y, lr);
-        g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(1, 'rgba(0,0,0,0)');
-        nctx.fillStyle = g; nctx.fillRect(x - lr, y - lr, lr * 2, lr * 2);
-      }
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.imageSmoothingEnabled = true;
-      ctx.drawImage(night, 0, 0, night.width, night.height, 0, 0, night.width * zoom, night.height * zoom);
-      ctx.setTransform(zoom, 0, 0, zoom, -ox * zoom, -oy * zoom);
+      // Obscurité : un seul dégradé radial centré sur le héros (léger pour les téléphones)
+      const lx = h ? h.x : ox + VW / 2, ly = h ? h.y - 6 : oy + VH / 2;
+      const g = ctx.createRadialGradient(lx, ly, 18, lx, ly, 110);
+      g.addColorStop(0, 'rgba(8,10,40,0)');
+      g.addColorStop(0.55, `rgba(8,10,40,${dark * 0.55})`);
+      g.addColorStop(1, `rgba(8,10,40,${dark})`);
+      ctx.fillStyle = g;
+      ctx.fillRect(ox - 2, oy - 2, VW + 4, VH + 4);
     }
     G.fx.drawTexts(ctx);
 

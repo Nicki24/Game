@@ -32,7 +32,7 @@ G.combat = (() => {
     return {
       id: 'hero', kind: 'hero', team: 'ally', name: save.name, x, y, r: 5,
       hp: st.hp, mhp: st.hp, mp: st.mp, mmp: st.mp, s: st, lvl: save.lvl,
-      tpl: 'humanoid', pal: c.pal, weapon: c.weapon, basic: c.basic, el: null,
+      tpl: 'humanoid', pal: c.pal, look: c.look, weapon: c.weapon, basic: c.basic, el: null,
       buffs: [], st: {}, faceX: 1, dir: 0, atkCd: 0, anim: 0, hurtT: 0, skillCd: {},
       rollCd: 0, iframes: 0, potCd: 0, lastHit: 99,
     };
@@ -66,7 +66,7 @@ G.combat = (() => {
     return {
       id: 'ally_' + cid, cid, kind: 'ally', team: 'ally', name: c.name.split(' ')[0], x, y, r: 5,
       hp: st.hp, mhp: st.hp, mp: 100, mmp: 100, s: st, lvl: S().save.lvl,
-      tpl: 'humanoid', pal: c.pal, short: c.short, weapon: c.weapon, basic: c.basic, ai: c.ai, skillId: c.skill,
+      tpl: 'humanoid', pal: c.pal, look: c.look, short: c.short, weapon: c.weapon, basic: c.basic, ai: c.ai, skillId: c.skill,
       buffs: [], st: {}, faceX: 1, dir: 0, atkCd: 0, anim: 0, hurtT: 0, skillCd: 2, reviveT: 0, el: null,
     };
   }
@@ -85,7 +85,7 @@ G.combat = (() => {
         atk: (6 + 3.2 * L) * d.atk * nm * (boss ? 1.2 : 1), mag: (6 + 3.2 * L) * d.atk * nm * (boss ? 1.2 : 1),
         def: (2 + 1.4 * L) * d.def, crit: boss ? 8 : 4, spd: d.spd,
       },
-      lvl, def: d, rank: d.rank || 'normal', el: d.el, tpl: d.tpl, pal: d.pal, short: d.small, weapon: d.weapon,
+      lvl, def: d, rank: d.rank || 'normal', el: d.el, tpl: d.tpl, pal: d.pal, look: d.look, short: d.small, weapon: d.weapon,
       scale: d.scale || (elite ? 1.35 : 1), home: { x, y }, state: 'idle', wanderT: U.rand(0, 3), wp: null,
       buffs: [], st: {}, faceX: -1, dir: Math.PI, atkCd: U.rand(0.5, 1.5), anim: U.rand(0, 1), hurtT: 0, windup: 0,
       night, summoned: !!opts.summoned,

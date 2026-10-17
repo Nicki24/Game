@@ -5,6 +5,7 @@ import { writeFileSync, mkdirSync } from 'fs';
 const b = await chromium.launch();
 const p = await b.newPage();
 await p.goto('http://localhost:8766/tools/icon.html');
+await p.evaluate(() => window.__ready);
 const save = async (file, size, opts) => {
   const url = await p.evaluate(([s, o]) => drawIcon(s, o), [size, opts || {}]);
   writeFileSync(file, Buffer.from(url.split(',')[1], 'base64'));

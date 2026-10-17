@@ -90,10 +90,10 @@ G.ui = (() => {
 
   function updateParty() {
     const st = S();
-    els['hud-portrait'].src = G.sprites.portrait('humanoid', D.CLASSES[st.save.cls].pal);
+    els['hud-portrait'].src = G.sprites.portrait('humanoid', D.CLASSES[st.save.cls].pal, false, D.CLASSES[st.save.cls].look);
     const html = st.party.filter((p) => p.kind === 'ally').map((a) => {
       const c = D.COMPANIONS[a.cid];
-      return `<div class="pm ${a.dead ? 'dead' : ''}"><img src="${G.sprites.portrait('humanoid', c.pal, c.short)}"><div style="flex:1"><div class="n">${esc(a.name)} ${a.dead ? '(' + Math.ceil(a.reviveT) + 's)' : ''}</div><div class="bar hp"><i style="width:${(a.hp / a.mhp) * 100}%"></i></div></div></div>`;
+      return `<div class="pm ${a.dead ? 'dead' : ''}"><img src="${G.sprites.portrait('humanoid', c.pal, c.short, c.look)}"><div style="flex:1"><div class="n">${esc(a.name)} ${a.dead ? '(' + Math.ceil(a.reviveT) + 's)' : ''}</div><div class="bar hp"><i style="width:${(a.hp / a.mhp) * 100}%"></i></div></div></div>`;
     }).join('');
     if (lastVals.party !== html) { lastVals.party = html; els['hud-party'].innerHTML = html; }
   }
@@ -329,7 +329,7 @@ G.ui = (() => {
         const isHero = p.kind === 'hero';
         const pal = isHero ? D.CLASSES[s.cls].pal : D.COMPANIONS[p.cid].pal;
         const sub = isHero ? D.CLASSES[s.cls].name : `${D.COMPANIONS[p.cid].role} · Rang ${s.ranks[p.cid] || 0}/5 · Compétence : ${D.SKILLS[p.skillId].name}`;
-        return `<div class="row"><img class="portrait" src="${G.sprites.portrait('humanoid', pal, !isHero && D.COMPANIONS[p.cid].short)}"><div class="grow"><div class="ttl">${esc(isHero ? s.name : D.COMPANIONS[p.cid].name)} — Niv. ${s.lvl}</div><div class="sub">${sub}<br>PV ${Math.ceil(p.hp)}/${p.mhp} · Att ${Math.round(p.s.atk)} · Mag ${Math.round(p.s.mag)} · Déf ${Math.round(p.s.def)} · Crit ${Math.round(p.s.crit)}%</div></div></div>`;
+        return `<div class="row"><img class="portrait" src="${G.sprites.portrait('humanoid', pal, !isHero && D.COMPANIONS[p.cid].short, isHero ? D.CLASSES[s.cls].look : D.COMPANIONS[p.cid].look)}"><div class="grow"><div class="ttl">${esc(isHero ? s.name : D.COMPANIONS[p.cid].name)} — Niv. ${s.lvl}</div><div class="sub">${sub}<br>PV ${Math.ceil(p.hp)}/${p.mhp} · Att ${Math.round(p.s.atk)} · Mag ${Math.round(p.s.mag)} · Déf ${Math.round(p.s.def)} · Crit ${Math.round(p.s.crit)}%</div></div></div>`;
       }).join('');
       return rows + '<p class="muted">Recrutez et changez vos compagnons à la Taverne de l\'Étoile Filante (Mère Garance). Ils montent de niveau avec vous et peuvent être entraînés (rangs). S\'ils tombent, ils reviennent au combat après 15 secondes.</p>';
     }
@@ -338,7 +338,7 @@ G.ui = (() => {
         const m = D.MONSTERS[id], k = s.bestiary[id] || 0;
         if (!k) return `<div class="best unknown"><div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:20px">?</div><div>???<br><span class="muted">Non découvert</span></div></div>`;
         const weak = Object.keys(D.ELEMENTS).filter((e) => D.elementMod(e, m.el) > 1).map((e) => D.ELEMENTS[e].icon + ' ' + D.ELEMENTS[e].name).join(', ') || '—';
-        return `<div class="best"><img src="${G.sprites.portrait(m.tpl, m.pal, m.small)}"><div><b style="color:${m.rank === 'boss' ? '#ff6a8a' : m.rank === 'elite' ? '#ffd84a' : '#fff'}">${esc(m.name)}</b><br>${D.ELEMENTS[m.el].icon} ${D.ELEMENTS[m.el].name} · Vaincus : ${k}<br><span class="muted">Faible : ${weak}</span></div></div>`;
+        return `<div class="best"><img src="${G.sprites.portrait(m.tpl, m.pal, m.small, m.look)}"><div><b style="color:${m.rank === 'boss' ? '#ff6a8a' : m.rank === 'elite' ? '#ffd84a' : '#fff'}">${esc(m.name)}</b><br>${D.ELEMENTS[m.el].icon} ${D.ELEMENTS[m.el].name} · Vaincus : ${k}<br><span class="muted">Faible : ${weak}</span></div></div>`;
       }).join('');
       const found = Object.keys(D.MONSTERS).filter((id) => s.bestiary[id]).length;
       return `<p class="muted">Créatures découvertes : ${found}/${Object.keys(D.MONSTERS).length}. Cycle élémentaire : 🔥 Feu > 🌿 Nature > ⚡ Foudre > ❄ Glace > 🔥 Feu · ☀ Lumière ⇄ ☾ Ombre (dégâts ×1,5).</p><div class="best-grid">${cards}</div>`;
@@ -430,7 +430,7 @@ G.ui = (() => {
       else if (!has) btn = `<button class="b small gold" data-act="recruit" data-arg="${cid}" ${s.gold >= c.cost ? '' : 'disabled'}>Recruter (${c.cost} or)</button>`;
       else btn = `<button class="b small ${inParty ? 'red' : 'green'}" data-act="party" data-arg="${cid}">${inParty ? 'Renvoyer' : "Dans l'équipe"}</button>` + ((s.ranks[cid] || 0) < 5 ? `<button class="b small" data-act="train" data-arg="${cid}">Entraîner (${G.game.trainCost(cid)} or)</button>` : '<span class="tag">Rang max</span>');
       const st = G.combat.allyStats(cid);
-      return `<div class="row"><img class="portrait" src="${G.sprites.portrait('humanoid', c.pal, c.short)}"><div class="grow"><div class="ttl">${esc(c.name)} ${inParty ? '<span class="tag" style="background:#3aa85a">En équipe</span>' : ''}</div>
+      return `<div class="row"><img class="portrait" src="${G.sprites.portrait('humanoid', c.pal, c.short, c.look)}"><div class="grow"><div class="ttl">${esc(c.name)} ${inParty ? '<span class="tag" style="background:#3aa85a">En équipe</span>' : ''}</div>
         <div class="sub"><span class="tag">${c.race}</span><span class="tag">${c.role}</span> Rang ${s.ranks[cid] || 0}/5<br>${c.desc}<br>PV ${st.hp} · Att ${st.atk} · Mag ${st.mag} · Déf ${st.def} · Compétence : ${D.SKILLS[c.skill].name}</div></div><div style="display:flex;flex-direction:column;gap:4px">${btn}</div></div>`;
     }).join('');
   }
@@ -475,11 +475,18 @@ G.ui = (() => {
     selForge: (k) => { menuState.sel = k; rerender(); },
     forge: () => { const it = itemByKey(menuState.sel); if (!it) return; const r = G.game.forge(it); toast(r.msg, r.ok ? '#6dff8a' : '#ff8a8a'); rerender(); },
     salvageForge: () => { const it = itemByKey(menuState.sel); if (!it) return; const go = () => { G.game.salvage(it); menuState.sel = null; rerender(); }; if (it.rarity >= 2 || it.plus) confirm(`Recycler ${I.displayName(it)} ?`, go); else go(); },
-    recruit: (cid) => { if (G.game.recruit(cid)) toast(D.COMPANIONS[cid].name + ' rejoint votre cause !', 'gold'); rerender(); },
+    recruit: (cid) => { if (G.game.recruit(cid)) { toast(D.COMPANIONS[cid].name + ' rejoint votre cause !', 'gold'); closeMenu(); dialog([{ name: D.COMPANIONS[cid].name, text: D.COMPANIONS[cid].hello, portrait: facePortrait(cid) }], openTavern); return; } rerender(); },
     party: (cid) => { G.game.toggleParty(cid); rerender(); },
     train: (cid) => { if (G.game.train(cid)) toast(D.COMPANIONS[cid].name + ' devient plus fort !', 'gold'); rerender(); },
     travel: (i) => { closeMenu(); G.game.enterZone(+i); },
   };
+
+  // Portrait illustré d'un personnage ('hero', id de PNJ ou de compagnon)
+  function facePortrait(id) {
+    if (id === 'hero') { const c = D.CLASSES[S().save.cls]; return G.sprites.portrait('humanoid', c.pal, false, c.look); }
+    const n = D.NPCS[id] || D.COMPANIONS[id];
+    return G.sprites.portrait('humanoid', n.pal, n.small || n.short, n.look);
+  }
 
   // ================================================================ Écrans
   function screen(html) {
@@ -525,7 +532,7 @@ G.ui = (() => {
     const cards = Object.keys(D.CLASSES).map((id) => {
       const c = D.CLASSES[id];
       const bar = (k, n) => `<span>${n}</span><span class="m"><i style="width:${(c.base[k] / max[k]) * 100}%"></i></span>`;
-      return `<div class="class-card ${id === cls ? 'sel' : ''}" data-cls="${id}"><img src="${G.sprites.portrait('humanoid', c.pal)}"><div class="cn">${c.name}</div><div class="ct">${c.title} · ${D.ELEMENTS[c.element].icon}</div><div class="cd">${c.desc}</div>
+      return `<div class="class-card ${id === cls ? 'sel' : ''}" data-cls="${id}"><img src="${G.sprites.portrait('humanoid', c.pal, false, c.look)}"><div class="cn">${c.name}</div><div class="ct">${c.title} · ${D.ELEMENTS[c.element].icon}</div><div class="cd">${c.desc}</div>
         <div class="mini-stats">${bar('hp', 'PV')}${bar('mp', 'PM')}${bar('atk', 'Att.')}${bar('mag', 'Mag.')}${bar('def', 'Déf.')}${bar('spd', 'Vit.')}</div></div>`;
     }).join('');
     screen(`<div class="create"><div class="h" style="font-size:22px;text-align:center">Créer votre Gardien</div>
@@ -544,10 +551,11 @@ G.ui = (() => {
       showStory(D.INTRO, () => {
         hideScreen();
         G.game.startPlaying();
+        const sel = facePortrait('selene');
         setTimeout(() => dialog([
-          { name: 'Guide', text: "Bienvenue à Aubeclair ! Utilisez le joystick à gauche de l'écran pour vous déplacer." },
-          { name: 'Guide', text: "Approchez-vous des habitants et touchez le gros bouton pour leur parler. Le « ! » signale une quête." },
-          { name: 'Guide', text: "Commencez par l'Oracle Séléné, devant le temple au nord du village." },
+          { name: 'Séléné (télépathie)', text: "Bienvenue à Aubeclair, Gardien ! Utilise le joystick à gauche de l'écran pour te déplacer.", portrait: sel },
+          { name: 'Séléné (télépathie)', text: "Approche-toi des habitants et touche le gros bouton pour leur parler. Le « ! » signale une quête.", portrait: sel },
+          { name: 'Séléné (télépathie)', text: "Rejoins-moi devant le temple, au nord du village.", portrait: sel },
         ]), 2600);
       });
     };
@@ -576,7 +584,7 @@ G.ui = (() => {
       const t = Math.floor(s.playTime);
       screen(`<div class="title-wrap"><div class="eclipse" style="background:radial-gradient(#fff3b0,#ffb03a)"></div><div class="logo" style="font-size:38px">FIN</div><div class="subtitle">Merci d'avoir joué à Éclipsia !</div>
         <p>${esc(s.name)} · ${D.CLASSES[s.cls].name} · Niveau ${s.lvl}<br>Temps de jeu : ${Math.floor(t / 3600)}h ${Math.floor((t % 3600) / 60)}min · Monstres vaincus : ${s.kills}</p>
-        <div class="credits">Univers, histoire, personnages, pixel-art procédural et musiques générées : créés pour ce projet.<br>Inspiré par l'esprit des RPG d'action mobiles comme Inotia.</div>
+        <div class="credits">Univers, histoire, personnages, graphismes 2D, portraits et musiques générés par le code : créés pour ce projet.<br>Inspiré par l'esprit des RPG d'action mobiles comme Inotia.</div>
         <button class="b gold" id="e-go" style="margin-top:12px">Continuer l'aventure</button></div>`);
       $('e-go').onclick = () => { hideScreen(); G.game.enterZone(0); };
     });
@@ -584,6 +592,6 @@ G.ui = (() => {
 
   return {
     init, showHUD, update, toast, banner, bossBar, dialog, isBlocking, confirm, openMenu, closeMenu, openShop, openForge, openTavern, openPortal,
-    showTitle, showDead, showEnding, setMinimap,
+    showTitle, showDead, showEnding, setMinimap, facePortrait,
   };
 })();

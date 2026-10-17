@@ -12,7 +12,8 @@
 
 ![Plateforme](https://img.shields.io/badge/plateforme-Android_|_Web_|_iOS_(PWA)-ffd84a?style=flat-square)
 ![Langue](https://img.shields.io/badge/langue-Français-blue?style=flat-square)
-![Moteur](https://img.shields.io/badge/moteur-HTML5_Canvas-orange?style=flat-square)
+![Moteur](https://img.shields.io/badge/moteur-HTML5_Canvas_2D-orange?style=flat-square)
+![Graphismes](https://img.shields.io/badge/graphismes-2D_vectoriels-ff69b4?style=flat-square)
 ![Hors ligne](https://img.shields.io/badge/jouable-hors_ligne-success?style=flat-square)
 ![Dépendances](https://img.shields.io/badge/assets_externes-0-purple?style=flat-square)
 
@@ -27,6 +28,7 @@
 - [📲 Télécharger et installer](#-télécharger-et-installer)
 - [📖 L'histoire](#-lhistoire)
 - [⚔️ Les quatre classes](#️-les-quatre-classes)
+- [🎭 Les visages de Valdris](#-les-visages-de-valdris)
 - [🤝 Les compagnons](#-les-compagnons)
 - [🗺️ Le monde de Valdris](#️-le-monde-de-valdris)
 - [🎮 Système de jeu](#-système-de-jeu)
@@ -104,6 +106,14 @@ Chaque classe a son **arme propre** (épée, bâton, arc, masse), ses statistiqu
 
 ---
 
+## 🎭 Les visages de Valdris
+
+Tous les personnages ont un portrait illustré, généré directement par le code du jeu et affiché pendant les conversations :
+
+<img src="docs/screenshots/00-portraits.png" width="100%" alt="Portraits des personnages et des créatures">
+
+---
+
 ## 🤝 Les compagnons
 
 Comme dans Inotia, vous partez à l'aventure avec **jusqu'à 2 mercenaires** recrutés à la **Taverne de l'Étoile Filante**. Ils gagnent des niveaux avec vous, utilisent leur propre compétence et ont chacun leur intelligence artificielle.
@@ -164,7 +174,9 @@ Comme dans Inotia, vous partez à l'aventure avec **jusqu'à 2 mercenaires** rec
 | 💚 **Potions d'équipe** | Une potion de vie soigne **tout le groupe**, et les compagnons tombés se relèvent seuls après 15 secondes. |
 | 📈 **Entraînement des compagnons** | Montez le rang de vos mercenaires à la taverne (+10 % de statistiques par rang). |
 | 📚 **Bestiaire** | Toutes les créatures rencontrées, leur élément, leurs faiblesses et votre nombre de victoires. |
-| 🎵 **Zéro fichier externe** | Graphismes pixel-art et musiques **générés par le code** : le jeu pèse quelques centaines de Ko et fonctionne hors ligne. |
+| 🎨 **Graphismes 2D dessinés par le code** | Personnages façon dessin animé avec contours, ombrages et membres animés, décors en dégradés : nets sur tous les écrans. |
+| 🖼️ **Portraits illustrés** | Chaque personnage a son visage dessiné (yeux, coiffure, barbe, oreilles d'elfe, lunettes, couronne…), affiché dans les dialogues, le HUD, la taverne et le bestiaire. |
+| 🎵 **Zéro fichier externe** | Graphismes et musiques **générés par le code** : le jeu pèse quelques centaines de Ko et fonctionne hors ligne. |
 
 ---
 
@@ -219,7 +231,8 @@ Comme dans Inotia, vous partez à l'aventure avec **jusqu'à 2 mercenaires** rec
 <td><img src="docs/screenshots/12-portail.png" alt="Portail"><br><sub>🌀 Le Portail des Vents vers les cinq régions</sub></td>
 </tr>
 <tr>
-<td colspan="2"><img src="docs/screenshots/07-boss-morvane.png" alt="Morvane"><br><sub>👑 Le combat final contre Morvane, Souverain du Néant</sub></td>
+<td><img src="docs/screenshots/07-boss-morvane.png" alt="Morvane"><br><sub>👑 Le combat final contre Morvane, Souverain du Néant</sub></td>
+<td><img src="docs/screenshots/13-dialogue.png" alt="Dialogue"><br><sub>💬 Brom rejoint l'équipe : dialogues avec portraits illustrés</sub></td>
 </tr>
 </table>
 
@@ -227,7 +240,7 @@ Comme dans Inotia, vous partez à l'aventure avec **jusqu'à 2 mercenaires** rec
 
 ## 🛠️ Côté technique
 
-Éclipsia est écrit en **JavaScript pur** (aucun framework, aucune image ni fichier audio) et affiché dans un **Canvas HTML5**. Pour Android, il est empaqueté dans une application native avec **[Capacitor](https://capacitorjs.com/)**.
+Éclipsia est écrit en **JavaScript pur** (aucun framework, aucune image ni fichier audio) et affiché dans un **Canvas HTML5**. Tous les graphismes sont des dessins **2D vectoriels** tracés en temps réel (contours, dégradés, animations des membres). Pour Android, il est empaqueté dans une application native avec **[Capacitor](https://capacitorjs.com/)**.
 
 ```
 Game/
@@ -242,7 +255,7 @@ Game/
 │       ├── game.js           ← boucle de jeu, zones, quêtes, butin, niveaux, sauvegarde
 │       ├── combat.js         ← dégâts, éléments, compétences, IA des monstres / compagnons / boss
 │       ├── render.js         ← affichage : carte, personnages, lumière jour/nuit
-│       ├── sprites.js        ← pixel-art procédural (personnages, monstres, décors, icônes)
+│       ├── sprites.js        ← graphismes 2D vectoriels : personnages animés, monstres, décors, portraits, icônes
 │       ├── world.js          ← génération des cartes (village + donjons aléatoires)
 │       ├── items.js          ← objets, raretés, forge, recyclage
 │       ├── ui.js             ← HUD, dialogues, menus, boutique, forge, taverne

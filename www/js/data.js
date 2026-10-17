@@ -33,7 +33,7 @@ G.data = (() => {
       base: { hp: 125, mp: 40, atk: 12, mag: 4, def: 8, crit: 5, spd: 64 },
       grow: { hp: 19, mp: 4, atk: 2.7, mag: 0.8, def: 1.9 },
       basic: { type: 'melee', range: 24, arc: 1.9, cd: 0.42, power: 'atk' },
-      pal: { h: '#e8eef8', a: '#2f5fbf', b: '#ffd34a', c: '#7a4b22', d: '#28324a', f: '#4a2f1a', s: '#f2c79a' },
+      look: { hair: 'pony', eye: '#3a7bd5', shoulder: true }, pal: { h: '#e8eef8', a: '#2f5fbf', b: '#ffd34a', c: '#7a4b22', d: '#28324a', f: '#4a2f1a', s: '#f2c79a' },
       skills: ['tranche_foudre', 'tourbillon', 'charge_orage', 'cri_titan'],
     },
     arcaniste: {
@@ -42,7 +42,7 @@ G.data = (() => {
       base: { hp: 82, mp: 95, atk: 5, mag: 15, def: 4, crit: 6, spd: 60 },
       grow: { hp: 11, mp: 10, atk: 1, mag: 3.1, def: 1 },
       basic: { type: 'proj', range: 150, cd: 0.6, power: 'mag', speed: 190, proj: 'orb', element: 'phys' },
-      pal: { h: '#c0392b', a: '#6a2c91', b: '#ff9a3c', c: '#3a1d4f', d: '#2a1838', f: '#3b2614', s: '#f5d2b0' },
+      look: { hair: 'short', hat: 'wizard', eye: '#ff8a2a' }, pal: { h: '#c0392b', a: '#6a2c91', b: '#ff9a3c', c: '#3a1d4f', d: '#2a1838', f: '#3b2614', s: '#f5d2b0' },
       skills: ['boule_braise', 'lance_givre', 'pluie_meteores', 'chaine_eclairs'],
     },
     rodeuse: {
@@ -51,7 +51,7 @@ G.data = (() => {
       base: { hp: 96, mp: 55, atk: 11, mag: 6, def: 5, crit: 12, spd: 72 },
       grow: { hp: 14, mp: 6, atk: 2.6, mag: 1.2, def: 1.3 },
       basic: { type: 'proj', range: 160, cd: 0.48, power: 'atk', speed: 240, proj: 'arrow', element: 'phys' },
-      pal: { h: '#3d2a1a', a: '#2e7d4f', b: '#c8a24a', c: '#5b3a1e', d: '#2c3b2a', f: '#3a2414', s: '#e0a878' },
+      look: { hair: 'long', eye: '#3aa86a', feather: true }, pal: { h: '#3d2a1a', a: '#2e7d4f', b: '#c8a24a', c: '#5b3a1e', d: '#2c3b2a', f: '#3a2414', s: '#e0a878' },
       skills: ['tir_percant', 'volee', 'piege_ombre', 'danse_vent'],
     },
     sentinelle: {
@@ -60,7 +60,7 @@ G.data = (() => {
       base: { hp: 135, mp: 72, atk: 9, mag: 10, def: 10, crit: 4, spd: 58 },
       grow: { hp: 20, mp: 8, atk: 2, mag: 2.2, def: 2.2 },
       basic: { type: 'melee', range: 22, arc: 1.7, cd: 0.5, power: 'atk' },
-      pal: { h: '#f4d03f', a: '#ecf0f1', b: '#f1c40f', c: '#a67c2e', d: '#7f8c8d', f: '#5d4a2a', s: '#f4cfa4' },
+      look: { hair: 'bun', eye: '#4a90d9', circlet: true, shoulder: true }, pal: { h: '#f4d03f', a: '#ecf0f1', b: '#f1c40f', c: '#a67c2e', d: '#7f8c8d', f: '#5d4a2a', s: '#f4cfa4' },
       skills: ['frappe_sacree', 'priere_aube', 'jugement', 'egide'],
     },
   };
@@ -115,31 +115,35 @@ G.data = (() => {
   const COMPANIONS = {
     brom: {
       name: "Brom Cœur-d'Enclume", role: 'Protecteur', race: 'Nain', cost: 120, unlock: 0, weapon: 'hache',
+      hello: "Hé hé ! Une hache solide et un gardien courageux : on va leur fendre le crâne, à ces monstres !",
       desc: "Ancien forgeron de Cendrefer. Attire les ennemis sur lui et encaisse les coups.",
       base: { hp: 150, atk: 9, mag: 2, def: 12, crit: 4, spd: 56 }, grow: { hp: 22, atk: 2, mag: 0.4, def: 2.3 },
       basic: { type: 'melee', range: 22, arc: 1.8, cd: 0.7, power: 'atk' }, skill: 'provocation', ai: 'tank',
-      pal: { h: '#b5522b', a: '#7f8c8d', b: '#c0392b', c: '#4a3020', d: '#3b3b46', f: '#2a1c12', s: '#e6b48a' }, short: true,
+      look: { hair: 'short', beard: true, eye: '#6a4a2a', shoulder: true }, pal: { h: '#b5522b', a: '#7f8c8d', b: '#c0392b', c: '#4a3020', d: '#3b3b46', f: '#2a1c12', s: '#e6b48a' }, short: true,
     },
     lysa: {
       name: 'Lysa Feuillelune', role: 'Soigneuse', race: 'Elfe', cost: 220, unlock: 1, weapon: 'baton',
+      hello: "La forêt m'a parlé de toi, Gardien. Je veillerai sur ta vie comme sur la mienne.",
       desc: "Prêtresse sylvestre. Soigne l'allié le plus blessé et lance des orbes de lumière.",
       base: { hp: 85, atk: 4, mag: 11, def: 5, crit: 5, spd: 62 }, grow: { hp: 12, atk: 0.8, mag: 2.4, def: 1.1 },
       basic: { type: 'proj', range: 130, cd: 0.9, power: 'mag', speed: 170, proj: 'light', element: 'lumiere' }, skill: 'soin_lysa', ai: 'healer',
-      pal: { h: '#dfe7a8', a: '#3f9b5a', b: '#f2f2d0', c: '#2b5e37', d: '#2a4a32', f: '#3a2a18', s: '#f5dcc0' },
+      look: { hair: 'long', ears: 'elf', eye: '#3ac87a', circlet: true }, pal: { h: '#dfe7a8', a: '#3f9b5a', b: '#f2f2d0', c: '#2b5e37', d: '#2a4a32', f: '#3a2a18', s: '#f5dcc0' },
     },
     kaira: {
       name: 'Kaïra Lame-Nocturne', role: 'Assassine', race: 'Humaine', cost: 420, unlock: 2, weapon: 'dague',
+      hello: "J'ai servi Morvane autrefois. Laisse-moi réparer mes fautes… lame après lame.",
       desc: "Espionne repentie de la Citadelle. Rapide, mortelle, coups critiques fréquents.",
       base: { hp: 95, atk: 12, mag: 4, def: 5, crit: 22, spd: 74 }, grow: { hp: 13, atk: 2.8, mag: 0.6, def: 1.1 },
       basic: { type: 'melee', range: 20, arc: 1.6, cd: 0.38, power: 'atk' }, skill: 'lames_ombre', ai: 'dps',
-      pal: { h: '#1b1b2f', a: '#3b2b5a', b: '#b06bff', c: '#1f1530', d: '#201a2e', f: '#120d1a', s: '#d9a27c' },
+      look: { hair: 'short', mask: true, eye: '#b06bff', scar: true }, pal: { h: '#1b1b2f', a: '#3b2b5a', b: '#b06bff', c: '#1f1530', d: '#201a2e', f: '#120d1a', s: '#d9a27c' },
     },
     pip: {
       name: 'Pip Rouage', role: 'Mécanomancien', race: 'Gnome', cost: 650, unlock: 3, weapon: 'cle',
+      hello: "Génial, génial ! Tu vas voir, mes arcs Tesla ne ratent jamais. Enfin… presque jamais !",
       desc: "Inventeur génial et un peu fou. Ses arcs électriques rebondissent entre les ennemis.",
       base: { hp: 80, atk: 6, mag: 13, def: 5, crit: 8, spd: 60 }, grow: { hp: 11, atk: 1, mag: 2.8, def: 1 },
       basic: { type: 'proj', range: 140, cd: 0.75, power: 'mag', speed: 220, proj: 'spark', element: 'foudre' }, skill: 'arc_tesla', ai: 'dps',
-      pal: { h: '#ff8c1a', a: '#c88a2a', b: '#3dd6d0', c: '#5a3a1a', d: '#4a3a2a', f: '#2a1c12', s: '#f0c8a0' }, short: true,
+      look: { hair: 'wild', goggles: true, eye: '#2a9ad8' }, pal: { h: '#ff8c1a', a: '#c88a2a', b: '#3dd6d0', c: '#5a3a1a', d: '#4a3a2a', f: '#2a1c12', s: '#f0c8a0' }, short: true,
     },
   };
 
@@ -153,7 +157,7 @@ G.data = (() => {
     racine_noire:{ name: 'Racine-Noire, Gardien Corrompu', tpl: 'tree', el: 'nature', hp: 14, atk: 1.6, def: 1.2, spd: 30, xp: 12, ai: 'boss', rank: 'boss', scale: 2,
       patterns: ['slam', 'summon', 'ring'], summon: 'gluant', pal: { a: '#3b5d2a', b: '#6d8f3a', c: '#4a2f1d', l: '#ff4d6d' } },
     // Mines de Cendrefer
-    gobelin:     { name: 'Gobelin Mineur', tpl: 'humanoid', el: 'phys', hp: 1, atk: 1.1, def: 0.9, spd: 54, xp: 1.1, ai: 'melee', weapon: 'pioche', small: true, pal: { h: '#6b4b2a', s: '#7fb24a', a: '#7a5230', b: '#d0a040', c: '#3a2410', d: '#4a3a2a', f: '#2a1c12', e: '#ff3b3b' }, drop: 'minerai' },
+    gobelin:     { name: 'Gobelin Mineur', tpl: 'humanoid', el: 'phys', hp: 1, atk: 1.1, def: 0.9, spd: 54, xp: 1.1, ai: 'melee', weapon: 'pioche', small: true, look: { hair: 'bald', ears: 'goblin', eye: '#ff3b3b' }, pal: { h: '#6b4b2a', s: '#7fb24a', a: '#7a5230', b: '#d0a040', c: '#3a2410', d: '#4a3a2a', f: '#2a1c12', e: '#ff3b3b' }, drop: 'minerai' },
     chauve_braise:{ name: 'Chauve-Souris de Braise', tpl: 'bat', el: 'feu', hp: 0.7, atk: 0.9, def: 0.5, spd: 70, xp: 1, ai: 'melee', fly: true, pal: { a: '#8a2b1a', e: '#ffcc33' } },
     golem_cendre:{ name: 'Golem de Cendre', tpl: 'golem', el: 'feu', hp: 2.2, atk: 1.4, def: 1.6, spd: 30, xp: 2, ai: 'melee', rank: 'elite', pal: { a: '#4a4038', b: '#ff6a1a', l: '#ffd23a' } },
     kragg:       { name: 'Kragg, le Forgeur Déchu', tpl: 'golem', el: 'feu', hp: 16, atk: 1.7, def: 1.5, spd: 36, xp: 14, ai: 'boss', rank: 'boss', scale: 2.2,
@@ -166,16 +170,16 @@ G.data = (() => {
       patterns: ['ring', 'slam', 'nova', 'summon'], summon: 'esprit_givre', pal: { a: '#e8fbff', b: '#4aa8e8', e: '#0b1f4a' } },
     // Ruines Solaires
     scorpion:    { name: 'Scorpion de Verre', tpl: 'scorpion', el: 'foudre', hp: 1.2, atk: 1.2, def: 1.3, spd: 52, xp: 1.3, ai: 'melee', status: ['poison', 0.3], pal: { a: '#d8b45a', b: '#8ae8ff', e: '#ff3030' }, drop: 'dard' },
-    momie:       { name: 'Momie Foudroyée', tpl: 'humanoid', el: 'foudre', hp: 1.4, atk: 1.2, def: 1, spd: 40, xp: 1.4, ai: 'melee', pal: { h: '#e8dcc0', s: '#d8cba8', a: '#e0d4b4', b: '#ffe04a', c: '#a89a78', d: '#c8bb98', f: '#8a7c5c', e: '#4af0ff' } },
+    momie:       { name: 'Momie Foudroyée', tpl: 'humanoid', el: 'foudre', hp: 1.4, atk: 1.2, def: 1, spd: 40, xp: 1.4, ai: 'melee', look: { hair: 'wraps', eye: '#4af0ff', glow: true }, pal: { h: '#e8dcc0', s: '#d8cba8', a: '#e0d4b4', b: '#ffe04a', c: '#a89a78', d: '#c8bb98', f: '#8a7c5c', e: '#4af0ff' } },
     gardien_ruine:{ name: 'Gardien des Ruines', tpl: 'golem', el: 'foudre', hp: 1.6, atk: 1.2, def: 1.5, spd: 26, xp: 1.6, ai: 'ranged', proj: 'spark', rank: 'elite', pal: { a: '#b89b5e', b: '#3a86ff', l: '#ffe04a' } },
     colosse:     { name: "Colosse d'Orage", tpl: 'golem', el: 'foudre', hp: 19, atk: 1.9, def: 1.7, spd: 34, xp: 18, ai: 'boss', rank: 'boss', scale: 2.6,
       patterns: ['charge', 'ring', 'slam', 'nova'], summon: 'scorpion', pal: { a: '#8d7a4a', b: '#4ad8ff', l: '#fff36a' } },
     // Citadelle de l'Éclipse
-    chevalier_ombre:{ name: "Chevalier de l'Éclipse", tpl: 'humanoid', el: 'ombre', hp: 1.6, atk: 1.3, def: 1.4, spd: 50, xp: 1.5, ai: 'melee', weapon: 'epee', pal: { h: '#2a2238', s: '#4a3a5a', a: '#3a2a52', b: '#b06bff', c: '#1a1226', d: '#241a34', f: '#120d1a', e: '#ff3bd0' } },
+    chevalier_ombre:{ name: "Chevalier de l'Éclipse", tpl: 'humanoid', el: 'ombre', hp: 1.6, atk: 1.3, def: 1.4, spd: 50, xp: 1.5, ai: 'melee', weapon: 'epee', look: { hair: 'helm', eye: '#ff3bd0', glow: true, shoulder: true }, pal: { h: '#2a2238', s: '#4a3a5a', a: '#3a2a52', b: '#b06bff', c: '#1a1226', d: '#241a34', f: '#120d1a', e: '#ff3bd0' } },
     spectre:     { name: 'Spectre du Néant', tpl: 'ghost', el: 'ombre', hp: 1, atk: 1.3, def: 0.8, spd: 48, xp: 1.4, ai: 'ranged', proj: 'shadow', fly: true, pal: { a: '#6a4a9a', b: '#2a1a4a', e: '#ff4af0' } },
     chien_neant: { name: 'Chien du Néant', tpl: 'beast', el: 'ombre', hp: 1.2, atk: 1.3, def: 0.9, spd: 66, xp: 1.3, ai: 'melee', pal: { a: '#3a2a52', b: '#0d0a14', c: '#7a5aa8', e: '#ff3b6b' } },
     morvane:     { name: 'Morvane, Souverain du Néant', tpl: 'humanoid', el: 'ombre', hp: 24, atk: 2.1, def: 1.8, spd: 44, xp: 30, ai: 'boss', rank: 'boss', scale: 2.4, weapon: 'epee', crown: true, final: true,
-      patterns: ['ring', 'slam', 'charge', 'summon', 'nova'], summon: 'spectre', pal: { h: '#0d0a14', s: '#c8b8e8', a: '#1a1028', b: '#ff2b6b', c: '#3a1a52', d: '#120a1e', f: '#0a0610', e: '#ff2b2b' } },
+      patterns: ['ring', 'slam', 'charge', 'summon', 'nova'], summon: 'spectre', look: { hair: 'long', crown: true, eye: '#ff2b2b', glow: true, shoulder: true, cape: true }, pal: { h: '#0d0a14', s: '#c8b8e8', a: '#1a1028', b: '#ff2b6b', c: '#3a1a52', d: '#120a1e', f: '#0a0610', e: '#ff2b2b' } },
   };
 
   // ---------------------------------------------------------------- Zones
@@ -270,12 +274,12 @@ G.data = (() => {
 
   // ---------------------------------------------------------------- PNJ du village
   const NPCS = {
-    selene:  { name: 'Séléné', title: "Oracle de l'Aube", tx: 20, ty: 6, pal: { h: '#e8e8ff', a: '#f0f0ff', b: '#ffd84a', c: '#b0a0e0', d: '#d0c8f0', f: '#8a7aa8', s: '#f4dcc8' }, role: 'story' },
-    orvin:   { name: 'Orvin', title: 'Marchand', tx: 31, ty: 13, pal: { h: '#7a4a2a', a: '#2a8a6a', b: '#ffd84a', c: '#5a3a1a', d: '#3a3a4a', f: '#2a1c12', s: '#e8b890' }, role: 'shop' },
-    tilda:   { name: 'Tilda', title: 'Forgeronne', tx: 9, ty: 13, pal: { h: '#ff6a2a', a: '#5a4a3a', b: '#c0392b', c: '#3a2a1a', d: '#3a3030', f: '#1a120c', s: '#e0a070' }, role: 'forge' },
-    garance: { name: 'Mère Garance', title: "Taverne de l'Étoile Filante", tx: 11, ty: 23, pal: { h: '#b0b0b0', a: '#8a3a5a', b: '#f0e0c0', c: '#5a2a3a', d: '#4a2a3a', f: '#2a1c12', s: '#f0c8a8' }, role: 'tavern' },
-    bastien: { name: 'Bastien', title: 'Garde du village', tx: 26, ty: 24, pal: { h: '#a0a8b8', a: '#4a5a7a', b: '#c0c8d8', c: '#3a2a1a', d: '#3a4050', f: '#2a1c12', s: '#e0b088' }, role: 'quest' },
-    mila:    { name: 'Mila', title: 'Petite curieuse', tx: 17, ty: 17, pal: { h: '#ffb04a', a: '#ff6a8a', b: '#ffffff', c: '#c04a6a', d: '#5a3a6a', f: '#3a2a1a', s: '#f8d8b8' }, role: 'quest', small: true },
+    selene:  { name: 'Séléné', title: "Oracle de l'Aube", tx: 20, ty: 6, look: { hair: 'long', circlet: true, eye: '#8a6ad8' }, pal: { h: '#e8e8ff', a: '#f0f0ff', b: '#ffd84a', c: '#b0a0e0', d: '#d0c8f0', f: '#8a7aa8', s: '#f4dcc8' }, role: 'story' },
+    orvin:   { name: 'Orvin', title: 'Marchand', tx: 31, ty: 13, look: { hair: 'bald', mustache: true, eye: '#5a3a1a' }, pal: { h: '#7a4a2a', a: '#2a8a6a', b: '#ffd84a', c: '#5a3a1a', d: '#3a3a4a', f: '#2a1c12', s: '#e8b890' }, role: 'shop' },
+    tilda:   { name: 'Tilda', title: 'Forgeronne', tx: 9, ty: 13, look: { hair: 'pony', bandana: true, eye: '#3a7a3a' }, pal: { h: '#ff6a2a', a: '#5a4a3a', b: '#c0392b', c: '#3a2a1a', d: '#3a3030', f: '#1a120c', s: '#e0a070' }, role: 'forge' },
+    garance: { name: 'Mère Garance', title: "Taverne de l'Étoile Filante", tx: 11, ty: 23, look: { hair: 'bun', eye: '#6a4a8a', wrinkles: true }, pal: { h: '#b0b0b0', a: '#8a3a5a', b: '#f0e0c0', c: '#5a2a3a', d: '#4a2a3a', f: '#2a1c12', s: '#f0c8a8' }, role: 'tavern' },
+    bastien: { name: 'Bastien', title: 'Garde du village', tx: 26, ty: 24, look: { hair: 'helm', eye: '#4a6a9a', mustache: true }, pal: { h: '#a0a8b8', a: '#4a5a7a', b: '#c0c8d8', c: '#3a2a1a', d: '#3a4050', f: '#2a1c12', s: '#e0b088' }, role: 'quest' },
+    mila:    { name: 'Mila', title: 'Petite curieuse', tx: 17, ty: 17, look: { hair: 'twin', eye: '#3a9ad8' }, pal: { h: '#ffb04a', a: '#ff6a8a', b: '#ffffff', c: '#c04a6a', d: '#5a3a6a', f: '#3a2a1a', s: '#f8d8b8' }, role: 'quest', small: true },
   };
 
   // ---------------------------------------------------------------- Histoire

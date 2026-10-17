@@ -1,5 +1,5 @@
 // Éclipsia — service worker : rend le jeu jouable hors ligne
-const CACHE = 'eclipsia-v1';
+const CACHE = 'eclipsia-v2';
 const FILES = [
   './', './index.html', './manifest.webmanifest', './css/style.css',
   './js/util.js', './js/data.js', './js/sprites.js', './js/audio.js', './js/world.js', './js/items.js',

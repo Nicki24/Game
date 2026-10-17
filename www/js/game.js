@@ -93,7 +93,7 @@ G.game = (() => {
       S.map = villageCache.map; S.mapCanvas = villageCache.canvas;
       for (const nid in D.NPCS) {
         const n = D.NPCS[nid];
-        S.npcs.push({ isNpc: true, nid, name: n.name, x: n.tx * 16 + 8, y: n.ty * 16 + 8, tpl: 'humanoid', pal: n.pal, short: n.small, faceX: 1, anim: 0, st: {}, hurtT: 0 });
+        S.npcs.push({ isNpc: true, nid, name: n.name, x: n.tx * 16 + 8, y: n.ty * 16 + 8, tpl: 'humanoid', pal: n.pal, look: n.look, short: n.small, faceX: 1, anim: 0, st: {}, hurtT: 0 });
       }
     } else {
       S.save.visits[zone.id] = (S.save.visits[zone.id] || 0) + 1;
@@ -207,8 +207,8 @@ G.game = (() => {
       after(1.5, () => G.ui.showEnding());
       return;
     }
-    G.ui.dialog([{ name: 'Gardien', text: `Vous obtenez le ${zone.fragment} ! Il brille d'une lumière chaude dans votre main.` },
-      { name: 'Séléné (vision)', text: "Bravo, Gardien. Reviens à Aubeclair, j'ai une nouvelle mission pour toi." }]);
+    G.ui.dialog([{ name: S.save.name, text: `Vous obtenez le ${zone.fragment} ! Il brille d'une lumière chaude dans votre main.`, portrait: G.ui.facePortrait('hero') },
+      { name: 'Séléné (vision)', text: "Bravo, Gardien. Reviens à Aubeclair, j'ai une nouvelle mission pour toi.", portrait: G.ui.facePortrait('selene') }]);
   }
 
   function gainXp(n) {
@@ -415,7 +415,7 @@ G.game = (() => {
   function interactNpc(nid) {
     const n = D.NPCS[nid];
     const s = S.save;
-    const portrait = G.sprites.portrait('humanoid', n.pal, n.small);
+    const portrait = G.sprites.portrait('humanoid', n.pal, n.small, n.look);
     const say = (text) => ({ name: n.name, text, portrait });
     // 1) Quêtes à rendre
     const ready = readyQuests(nid);

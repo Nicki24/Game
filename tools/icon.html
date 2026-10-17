@@ -6,6 +6,9 @@
 <script src="../www/js/sprites.js"></script>
 <script>
 // Dessine l'icône d'Éclipsia : éclipse dorée + Gardienne Lame-Tempête en pixel-art
+window.__portrait = new Image();
+window.__ready = new Promise((r) => { window.__portrait.onload = r; });
+window.__portrait.src = G.sprites.portrait('humanoid', G.data.CLASSES.tempete.pal, false, G.data.CLASSES.tempete.look, 512);
 function drawIcon(size, opts = {}) {
   const c = document.getElementById('c');
   c.width = opts.w || size; c.height = size;
@@ -18,29 +21,22 @@ function drawIcon(size, opts = {}) {
   const r = G.util.rng(7);
   for (let i = 0; i < 40 * (W / H); i++) { x.fillStyle = `rgba(255,255,255,${0.3 + r() * 0.6})`; x.fillRect(r() * W, r() * H * 0.7, u * 0.6, u * 0.6); }
   // Éclipse
-  const cx = W / 2, cy = H * 0.4, R = 30 * u;
+  const cx = W / 2, cy = H * 0.44, R = 33 * u;
   const glow = x.createRadialGradient(cx, cy, R * 0.8, cx, cy, R * 1.9);
   glow.addColorStop(0, 'rgba(255,190,70,0.95)'); glow.addColorStop(0.35, 'rgba(255,120,40,0.45)'); glow.addColorStop(1, 'rgba(255,90,20,0)');
   x.fillStyle = glow; x.beginPath(); x.arc(cx, cy, R * 1.9, 0, Math.PI * 2); x.fill();
   x.fillStyle = '#fff3b0'; x.beginPath(); x.arc(cx, cy, R * 1.04, 0, Math.PI * 2); x.fill();
   x.fillStyle = '#0a0616'; x.beginPath(); x.arc(cx, cy, R, 0, Math.PI * 2); x.fill();
   x.fillStyle = '#20154a'; x.beginPath(); x.arc(cx + R * 0.18, cy + R * 0.1, R * 0.82, 0, Math.PI * 2); x.fill();
-  // Héroïne
-  x.imageSmoothingEnabled = false;
-  const pal = G.data.CLASSES.tempete.pal;
-  const spr = G.sprites.get('humanoid', pal, 0);
-  const sc = Math.floor(3.6 * u);
-  const sw = spr.width * sc, sh = spr.height * sc;
-  const sx = cx - sw / 2, sy = H * 0.94 - sh;
-  x.fillStyle = 'rgba(0,0,0,0.45)'; x.beginPath(); x.ellipse(cx, H * 0.94, sw * 0.45, sc * 1.5, 0, 0, Math.PI * 2); x.fill();
-  x.drawImage(spr, sx, sy, sw, sh);
-  x.save(); x.translate(cx + 3 * sc, sy + sh * 0.55); x.scale(sc / 1.1, sc / 1.1);
-  G.sprites.drawWeapon(x, 'epee', -1.05, 1, '#bfe8ff'); x.restore();
-  // Éclairs
-  x.strokeStyle = '#ffe04a'; x.lineWidth = u * 1.2; x.lineCap = 'round';
-  for (const [ax, ay, s] of [[cx + 15 * u, sy + 4 * u, 1], [cx - 19 * u, sy + 10 * u, -1]]) {
-    x.beginPath(); x.moveTo(ax, ay); x.lineTo(ax + 4 * u * s, ay + 5 * u); x.lineTo(ax + 1 * u * s, ay + 6 * u); x.lineTo(ax + 6 * u * s, ay + 12 * u); x.stroke();
-  }
+  // Portrait de l'héroïne dans l'éclipse
+  const C = G.data.CLASSES.tempete;
+  const img = window.__portrait;
+  x.save(); x.beginPath(); x.arc(cx, cy, R * 0.92, 0, Math.PI * 2); x.clip();
+  x.drawImage(img, cx - R * 0.92, cy - R * 0.92, R * 1.84, R * 1.84); x.restore();
+  x.strokeStyle = '#ffd84a'; x.lineWidth = u * 1.5; x.beginPath(); x.arc(cx, cy, R * 0.92, 0, Math.PI * 2); x.stroke();
+  // Épée en travers
+  x.save(); x.translate(cx - R * 1.05, cy + R * 1.42); x.scale(3.3 * u, 3.3 * u); x.lineJoin = 'round';
+  G.sprites.drawWeapon(x, 'epee', -0.42, 1, null); x.restore();
   if (opts.title) {
     x.textAlign = 'center';
     x.font = `bold ${16 * u}px Georgia, serif`;
