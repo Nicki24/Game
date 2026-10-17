@@ -1,0 +1,82 @@
+name: Construire l'APK Android
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'www/**'
+      - 'android-res/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'capacitor.config.json'
+      - '.github/workflows/android.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Installer Capacitor
+        run: npm ci
+
+      - name: Générer le projet Android
+        run: npx cap add android
+
+      - name: Icônes, plein écran, paysage et numéro de version
+        run: |
+          cp -r android-res/mipmap-* android/app/src/main/res/
+          rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
+          sed -i 's/<activity/<activity android:screenOrientation="sensorLandscape"/' android/app/src/main/AndroidManifest.xml
+          sed -i 's#<item name="windowNoTitle">true</item>#<item name="windowNoTitle">true</item>\n        <item name="android:windowFullscreen">true</item>#' android/app/src/main/res/values/styles.xml
+          sed -i -E 's/versionCode [0-9]+/versionCode ${{ github.run_number }}/; s/versionName "[^"]*"/versionName "1.0.${{ github.run_number }}"/' android/app/build.gradle
+          # Clé de signature commune à toutes les versions : les mises à jour s'installent par-dessus
+          mkdir -p ~/.android && cp tools/debug.keystore ~/.android/debug.keystore
+          npx cap sync android
+
+      - name: Compiler l'APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Préparer les fichiers
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk Eclipsia.apk
+          (cd www && zip -qr ../Eclipsia-web.zip .)
+          ls -la Eclipsia.apk Eclipsia-web.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Eclipsia-apk
+          path: Eclipsia.apk
+
+      - name: Publier la release (lien de téléchargement)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Éclipsia v1.0.${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          make_latest: true
+          files: |
+            Eclipsia.apk
+            Eclipsia-web.zip
+          body: |
+            ## 📱 Installer Éclipsia sur Android
+            1. Téléchargez **Eclipsia.apk** ci-dessous depuis votre téléphone.
+            2. Ouvrez le fichier et autorisez « Installer des applications inconnues » si Android le demande.
+            3. Lancez **Éclipsia** et bonne aventure, Gardien !
+
+            `Eclipsia-web.zip` contient la version navigateur (ouvrez `index.html`).

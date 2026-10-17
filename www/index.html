@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#120c22">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Éclipsia : Les Gardiens de l'Aube — un RPG d'action mobile inspiré des grands classiques comme Inotia.">
+  <title>Éclipsia : Les Gardiens de l'Aube</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <canvas id="game"></canvas>
+
+    <div id="hud" class="hidden">
+      <div id="hud-left">
+        <div class="hero-card">
+          <img id="hud-portrait" alt="">
+          <div class="hero-bars">
+            <div id="hud-name"></div>
+            <div class="bar hp"><i id="hud-hp"></i><span id="hud-hp-t"></span></div>
+            <div class="bar mp"><i id="hud-mp"></i><span id="hud-mp-t"></span></div>
+            <div class="bar xp"><i id="hud-xp"></i></div>
+          </div>
+        </div>
+        <div id="hud-party"></div>
+        <div id="hud-buffs"></div>
+      </div>
+      <div id="hud-right">
+        <div id="hud-zone"></div>
+        <canvas id="minimap" width="96" height="78"></canvas>
+        <div id="hud-info"><span id="hud-day"></span><span id="hud-gold"></span></div>
+      </div>
+      <button id="btn-menu" class="round" data-btn="menu" aria-label="Menu">☰</button>
+      <div id="combo"></div>
+      <div id="bossbar" class="hidden"><div id="boss-name"></div><div class="bar boss"><i id="boss-hp"></i></div></div>
+
+      <div id="joy-zone"><div id="joy-base"><div id="joy-knob"></div></div><div id="joy-hint">Glissez pour bouger</div></div>
+
+      <div id="controls">
+        <button class="btn attack" data-btn="attack" aria-label="Attaquer"><span id="attack-label">⚔</span></button>
+        <button class="btn skill" data-btn="skill0" id="sk0"></button>
+        <button class="btn skill" data-btn="skill1" id="sk1"></button>
+        <button class="btn skill" data-btn="skill2" id="sk2"></button>
+        <button class="btn skill" data-btn="skill3" id="sk3"></button>
+        <button class="btn dodge" data-btn="dodge" aria-label="Esquive">⤿<small>Esquive</small></button>
+        <button class="btn lien" data-btn="lien" id="btn-lien" aria-label="Lien d'Aube"><span class="lien-fill" id="lien-fill"></span><span class="lien-txt">LIEN</span></button>
+        <button class="btn pot hp" data-btn="potion_vie" aria-label="Potion de vie"><b>♥</b><span id="pot-hp-n">0</span></button>
+        <button class="btn pot mp" data-btn="potion_mana" aria-label="Potion de mana"><b>✦</b><span id="pot-mp-n">0</span></button>
+        <button class="btn auto" data-btn="auto" id="btn-auto">AUTO</button>
+        <button class="btn interact hidden" data-btn="interact" id="btn-interact">Parler</button>
+      </div>
+    </div>
+
+    <div id="toasts"></div>
+    <div id="banner"><div class="b-title"></div><div class="b-sub"></div></div>
+
+    <div id="dialog" class="hidden">
+      <img id="dlg-portrait" alt="">
+      <div class="dlg-body">
+        <div id="dlg-name"></div>
+        <div id="dlg-text"></div>
+        <div id="dlg-choices"></div>
+        <div id="dlg-next">▼</div>
+      </div>
+    </div>
+
+    <div id="menu" class="hidden"></div>
+    <div id="screen" class="hidden"></div>
+    <div id="modal" class="hidden"></div>
+  </div>
+
+  <script src="js/util.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/sprites.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/world.js"></script>
+  <script src="js/items.js"></script>
+  <script src="js/fx.js"></script>
+  <script src="js/combat.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/game.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !window.Capacitor) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    }
+  </script>
+</body>
+</html>
