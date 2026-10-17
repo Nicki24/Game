@@ -47,15 +47,25 @@ G.world = (() => {
     };
   }
 
+  // Génère un donjon assez grand (on réessaie si la caverne obtenue est trop petite)
   function makeDungeon(zone, visit) {
+    let best = null;
+    for (let k = 0; k < 12; k++) {
+      const m = tryDungeon(zone, zone.seed * 1000 + visit * 17 + k);
+      if (!best || m.floor > best.floor) best = m;
+      if (m.floor >= 1150 && m.maxDist >= 85) return m;
+    }
+    return best;
+  }
+
+  function tryDungeon(zone, seed) {
     const w = 64, h = 52;
-    const seed = zone.seed * 1000 + visit;
     const r = G.util.rng(seed);
     let tiles = new Uint8Array(w * h);
     const idx = (x, y) => y * w + x;
     // Automate cellulaire
     for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-      tiles[idx(x, y)] = x === 0 || y === 0 || x === w - 1 || y === h - 1 || r() < 0.46 ? 1 : 0;
+      tiles[idx(x, y)] = x === 0 || y === 0 || x === w - 1 || y === h - 1 || r() < 0.43 ? 1 : 0;
     }
     const walls = (t, x, y) => {
       let n = 0;
@@ -141,7 +151,7 @@ G.world = (() => {
       if ((x - bx) ** 2 + (y - by) ** 2 < 100) continue;
       if (spawns.some((s) => (s.tx - x) ** 2 + (s.ty - y) ** 2 < 49)) continue;
       spawns.push({ tx: x, ty: y, x: x * 16 + 8, y: y * 16 + 8, d: dist[c] });
-      if (spawns.length >= 24) break;
+      if (spawns.length >= 26) break;
     }
     const T = 16;
     return {
@@ -149,7 +159,7 @@ G.world = (() => {
       start: { x: (start % w) * T + 8, y: ((start / w) | 0) * T + 8 },
       boss: { x: bx * T + 8, y: by * T + 8 },
       portal: { x: (start % w) * T + 8, y: ((start / w) | 0) * T - 8 },
-      spawns, maxDist: bd,
+      spawns, maxDist: bd, floor: tiles.reduce((n, t) => n + (t === 0 ? 1 : 0), 0),
     };
   }
 

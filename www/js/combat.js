@@ -77,12 +77,12 @@ G.combat = (() => {
     const night = G.game.isNight();
     const nm = night ? 1.2 : 1;
     const elite = d.rank === 'elite', boss = d.rank === 'boss';
-    const hpMult = boss ? 1.8 : 1;
+    const hpMult = boss ? 2.6 : 1;
     const mhp = Math.round((24 + 16 * L) * d.hp * nm * hpMult);
     const m = {
       id: 'm' + U.uid(), mid, kind: 'mob', team: 'enemy', name: d.name, x, y, r: boss ? 9 : elite ? 7 : 5,
       hp: mhp, mhp, s: {
-        atk: (6 + 3.2 * L) * d.atk * nm, mag: (6 + 3.2 * L) * d.atk * nm,
+        atk: (6 + 3.2 * L) * d.atk * nm * (boss ? 1.2 : 1), mag: (6 + 3.2 * L) * d.atk * nm * (boss ? 1.2 : 1),
         def: (2 + 1.4 * L) * d.def, crit: boss ? 8 : 4, spd: d.spd,
       },
       lvl, def: d, rank: d.rank || 'normal', el: d.el, tpl: d.tpl, pal: d.pal, short: d.small, weapon: d.weapon,
